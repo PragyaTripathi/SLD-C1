@@ -10,7 +10,7 @@ def spatialSubSampling(timeIndex, ndarray, spacing):
 		for row in ndarray]
 	matrix = np.array(ndarray)
 	i,j = matrix.shape
-	return [[matrix[a*spacing:a*spacing+spacing][:,b*spacing:b*spacing+spacing].mean() \
+	return [[meanOfNonZeroElements(matrix[a*spacing:a*spacing+spacing][:,b*spacing:b*spacing+spacing]) \
 		for b in range(j/spacing)] \
 		for a in range(i/spacing)]
 
@@ -33,16 +33,28 @@ def formGraphFromSubSamples(subSamples, sigma):
 def maintainSparsity(ndarray):
 	return [[0 if rowElem != max(row) else rowElem for rowElem in row] \
 		for row in ndarray]
+
 # Returns adjacency matrix with all diagonal elements set to zero and upper triangular
 # matrix mirroring lower triangular matrix.
 # Works only if ndarray's diagonal and lower triangular matrix has all zeros.
 def adjacencyMatrix(ndarray):
 	return np.array(ndarray) + np.transpose(ndarray)
 
-x = scipy.io.loadmat('./temColFormat.mat')
+# Helper function for 
+def meanOfNonZeroElements(ndarray):
+	sum = 0
+	count = 0
+	for row in ndarray:
+		for e in row:
+			if e > 0:
+				sum += e
+				count += 1
+	return sum/count if count > 0 else 0
+
+x = scipy.io.loadmat('/Users/Pragya/Documents/SDL/SLD-C1/temColFormat.mat')
 pyA = x['tem']
 jan1994Index = convertDateToIndex(1994,1) ## January, 1994
 pyA = spatialSubSampling(jan1994Index, pyA, 16)
 pyA = formGraphFromSubSamples(pyA, 1) ## Taking sigma as 1
 pyA = maintainSparsity(pyA)
-print adjacencyMatrix(pyA)
+scipy.io.savemat('phase1-adjacencyMatrix.mat', mdict={'adjacencyMatrix': adjacencyMatrix(pyA)})
