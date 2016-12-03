@@ -36,12 +36,19 @@ class GraphFactory:
 				print("block matrix [{0}:{1}][{2}:{3}]".format(i*p, i*p+p, j*p, j*p+p))
 				blockName = '{0}_{1}'.format(i*p, j*p)
 				blockFilename = blockName + '.mat'
-				blockMatrix = [[exp(-1 * abs(flatArray[i*p+m] - flatArray[j*p+n])/(2*self.sigma**2)) if i*p+m != j*p+n else 0 \
-					for n in range(p)] \
-					for m in range(p)]
+				blockMatrix = [[exp(-1 * self.sumOfEuclidean(flatArray, i*p+m, j*p+n)/(2*self.sigma**2)) if i*p+m != j*p+n else 0 \
+						for n in range(p)] \
+						for m in range(p)]	
+				print(blockMatrix)
 				scipy.io.savemat(self.folderName + blockFilename, mdict={blockName: blockMatrix})
 				with open(self.folderName + "filelist.txt", "a") as blockMatrixIndexfile:
 					blockMatrixIndexfile.write(blockFilename + "\n")
+
+	def sumOfEuclidean(self, flatArray, index1, index2):
+		sum = 0
+		for i in range(np.asarray(flatArray[0]).size):
+			sum += abs(flatArray[index1][i] - flatArray[index2][i])**2
+		return sum
 
 	def my_range(self, start, end, step):
 		while end <= start:
@@ -64,3 +71,5 @@ class GraphFactory:
 					sum += e
 					count += 1
 		return sum/count if count > 0 else 0
+
+
