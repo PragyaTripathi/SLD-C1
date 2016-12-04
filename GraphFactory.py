@@ -88,5 +88,3 @@ class GraphFactory:
 					sum += e
 					count += 1
 		return sum/count if count > 0 else 0
-
-

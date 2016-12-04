@@ -1,0 +1,8 @@
+{
+	"spark": "/usr/local/src/spark-2.0.0-bin-hadoop2.7/bin/spark-submit",
+	"CAD": "/Users/Pragya/Documents/SDL/SLD-C1/CAD.py",
+	"CADOptions": "/Users/Pragya/Documents/SDL/SLD-C1/options.json",
+	"nodeFolder1": "/Users/Pragya/Documents/SDL/SLD-C1/SyntheticData2/",
+	"nodeFolder2": "/Users/Pragya/Documents/SDL/SLD-C1/SyntheticDataWithAnomalies2/",
+	"totalDataSize": 64
+}

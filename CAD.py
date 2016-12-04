@@ -347,7 +347,7 @@ def getdict(edge_list,dij):
 	edgeVSdistance = defaultdict(lambda : 0.0,edgeVSdistance)
 	return edgeVSdistance
 
-def GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,resultsFolder):
+def GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,resultsFile):
 	'''
 	dij : a vector with commute-time distance for each edge in edge_list
 	edge_list : a ndarry with shape (NumOfEdges,2)[Usually given as input along with adj mat]
@@ -379,9 +379,7 @@ def GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,resu
 	edges = increasing_edge_index_deltaE[:][:,0:2]
 	print "Edges shape ", edges.shape
 	anomalousNodes = Set([int(x) for x in edges.flatten()])
-	if not os.path.exists(resultsFolder):
-		os.makedirs(resultsFolder)
-	savemat(resultsFolder + "deltaE.mat", mdict={"deltaE": increasing_edge_index_deltaE})
+	savemat(resultsFile, mdict={"deltaE": increasing_edge_index_deltaE})
 	print "Anomalous Nodes ", anomalousNodes
 	print "DONE"
 
@@ -411,6 +409,7 @@ if __name__=='__main__':
 	resultsFolder = ""
 	PREFIX_CHAIN_PROD = 'PROD/chain-prod-'
 	USE_SAVED_CHAIN_PRODUCT = False
+	groundTruth = false
 
 	RUNTIME_PROFILING_ONLY = False
 	tol = 1e-2  # 1e-4
@@ -433,8 +432,13 @@ if __name__=='__main__':
 	    nodeFolder1 = data["nodeFolder1"]
 	    nodeFolder2 = data["nodeFolder2"]
 	    resultsFolder = data["resultsFolder"]
+	    groundTruth = data["groundTruth"]
 	    SQUARE_BLOCK_SIZE = int(data["squareBlockSize"])
 	    SQUARE_TOTAL_SIZE = int(data["squareTotalSize"])
+
+	if not os.path.exists(resultsFolder):
+		os.makedirs(resultsFolder)
+	resultsFile = resultsFolder + "deltaEGT.mat" if groundTruth else "deltaE.mat"
 		
 	#---------------------------LOGGING----------------------------------------------
 	mode = 'WARNING'
@@ -456,4 +460,4 @@ if __name__=='__main__':
 	dij1 = CommuteTimeDistances(edge_list1, adjacency_mat1, tol, epsilon, d)	
 	dij2 = CommuteTimeDistances(edge_list2, adjacency_mat2, tol, epsilon, d)
 	
-	GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,resultsFolder)
+	GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,resultsFile)

@@ -1,11 +1,14 @@
 from random import randint
 import numpy as np
+import subprocess
+from scipy.io import loadmat, savemat
 
 class LearningEngine:
 	def __init__(self, preknownRanks, preknownAnomalousNodes, dataSize):
 		self.preknownRanks = preknownRanks
 		self.preknownAnomalousNodes = preknownAnomalousNodes
 		self.dataSize = dataSize
+
 	
 	#Assuming ranks is an array of nodes. Their position is defined by array index.
 	def lossFunction(self, ranks):
@@ -23,8 +26,13 @@ class LearningEngine:
 		graphFactory.createGraph()
 		graphFactory2 = GraphFactory(newmatrix, randomSigma, 4, '/Users/Pragya/Documents/SDL/SLD-C1/SynesizedDataWithAnomalies/')
 		graphFactory2.createGraph()
-		# Run CAD
+		self.runCAD()
 		oldSigma = randomSigma
 		if self.preknownAnomalousNodes != anomalousNodes:
 			newSigma = oldSigma - learningRate * lossFunction(ranksFromCAD)
 
+	def runCAD(self):
+		cmd = ['/usr/local/src/spark-2.0.0-bin-hadoop2.7/bin/spark-submit', '/Users/Pragya/Documents/SDL/SLD-C1/CAD.py', '/Users/Pragya/Documents/SDL/SLD-C1/options.json']
+		p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+		out, err = p.communicate()
+		print out
