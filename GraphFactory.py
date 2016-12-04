@@ -14,35 +14,47 @@ class GraphFactory:
 		self.formGraphFromSubSamples(self.subSampleAndFlatten())
 
 	def subSampleAndFlatten(self):
+		if self.spacing == 0:
+			self.spacing = 1
 		matrix = np.array(self.timeSliceMatrix)
 		i,j = matrix.shape
 		flatArray = []
-		mappingToLocation = {}
+		mappingToLocation = []
 		index = 0
 		for a in range(i/self.spacing):
 			for b in range(j/self.spacing):
 				average = self.meanOfNonZeroElements(matrix[a*self.spacing:a*self.spacing+self.spacing][:,b*self.spacing:b*self.spacing+self.spacing])
-				mappingToLocation[index] = {"latitude": a*self.spacing, "longitude" : b*self.spacing}
+				mappingToLocation.append([a*self.spacing, b*self.spacing])
 				flatArray.append(average)
 				index += 1
-		json.dump(mappingToLocation, open(self.folderName + "/mappingToLocation.txt",'w'))
+		scipy.io.savemat(self.folderName + "/mappingToLocation.mat", mdict={"Location": mappingToLocation})
 		return flatArray
 
 	def formGraphFromSubSamples(self, flatArray):
 		arrayLen = len(flatArray)
 		p = self.find_divisor(arrayLen)
+		edgeList = []
 		for i in range(arrayLen/p):
 			for j in range(arrayLen/p):
 				print("block matrix [{0}:{1}][{2}:{3}]".format(i*p, i*p+p, j*p, j*p+p))
-				blockName = '{0}_{1}'.format(i*p, j*p)
+				blockName = '{0}_{1}'.format(i, j)
 				blockFilename = blockName + '.mat'
-				blockMatrix = [[exp(-1 * self.sumOfEuclidean(flatArray, i*p+m, j*p+n)/(2*self.sigma**2)) if i*p+m != j*p+n else 0 \
-						for n in range(p)] \
-						for m in range(p)]	
-				print(blockMatrix)
+				# blockMatrix = [[exp(-1 * abs(flatArray[i*p+m] - flatArray[j*p+n])/(2*self.sigma**2)) if i*p+m != j*p+n else 0 \
+					# for n in range(p)] \
+					# for m in range(p)]
+				blockMatrix = []
+				for m in range(p):
+					subArray = []
+					for n in range(p):
+						value = exp(-1 * abs(flatArray[i*p+m] - flatArray[j*p+n])/(2*self.sigma**2)) if i*p+m != j*p+n else 0
+						if value != 0:
+							edgeList.append([i*p+m, j*p+n])
+						subArray.append(value)
+					blockMatrix.append(subArray)
 				scipy.io.savemat(self.folderName + blockFilename, mdict={blockName: blockMatrix})
 				with open(self.folderName + "filelist.txt", "a") as blockMatrixIndexfile:
-					blockMatrixIndexfile.write(blockFilename + "\n")
+					blockMatrixIndexfile.write(self.folderName + blockFilename + "\n")
+		scipy.io.savemat(self.folderName + "/elist.mat", mdict={"elist": edgeList})
 
 	def sumOfEuclidean(self, flatArray, index1, index2):
 		sum = 0
