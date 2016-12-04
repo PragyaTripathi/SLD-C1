@@ -1,6 +1,7 @@
 {
-	"nodeFolder1": "/Users/Pragya/Documents/SDL/SLD-C1/Test2/",
-	"nodeFolder2": "/Users/Pragya/Documents/SDL/SLD-C1/TestWithAnomalies2/",
-	"squareBlockSize": 128,
-	"squareTotalSize": 256
+	"nodeFolder1": "/Users/Pragya/Documents/SDL/SLD-C1/SyntheticData2/",
+	"nodeFolder2": "/Users/Pragya/Documents/SDL/SLD-C1/SyntheticDataWithAnomalies2/",
+	"resultsFolder": "/Users/Pragya/Documents/SDL/SLD-C1/results/",
+	"squareBlockSize": 32,
+	"squareTotalSize": 64
 }

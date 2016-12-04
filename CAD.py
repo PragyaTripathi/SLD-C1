@@ -4,8 +4,9 @@ from pyspark.mllib.linalg.distributed import BlockMatrix, RowMatrix, Distributed
 from pyspark.mllib.linalg import DenseVector, Vectors
 from pyspark.mllib.linalg import Matrices, SparseMatrix, DenseMatrix
 from pyspark.sql import SQLContext
-from scipy.io import loadmat
+from scipy.io import loadmat, savemat
 from scipy import sparse
+from sets import Set
 import numpy as np, scipy.io as sio, os, re, mmap, math, logging, time, subprocess, gc, itertools as it, copy, functools, json
 from datetime import datetime
 from operator import add
@@ -162,7 +163,6 @@ def MatrixVectorMultiply(mat, vec):
 	for i in range(len(product_list)):
 		id = product_list[i][0]
 		product[(id*p) : ((id+1)*p)] = product_list[i][1]
-		
 	return product
 
 def RowBlocksDotVec(blocksInRow, vec):
@@ -229,7 +229,6 @@ def ExtractEdgesFromAdjBlock(block_mat):
 	all_edges_weights_rdd = block_mat.blocks.flatMap(EdgesPerBlock)
 	temp = all_edges_weights_rdd.collect()
 	temp = np.array(temp)
-	print temp.shape
 	#logging.warn('Extract edgesADJ temp done')
 	
 	all_edges_weights = temp[np.lexsort((temp[:, 0], temp[:, 1]))]
@@ -245,27 +244,26 @@ def EdgesPerBlock(b):
 	J = b[0][1]
 	edges = []
 	print "processing block",I,J,b[1]
-	# if I>J:
-	if isinstance(b[1], SparseMatrix):
-	
-		logging.warn('Start csc_matrix')
-		mat = sparse.csc_matrix((b[1].values, b[1].rowIndices, b[1].colPtrs), shape=(b[1].numRows, b[1].numCols))
-		links = sparse.find(mat)
-		edges = zip((links[0]+ (I * SQUARE_BLOCK_SIZE)), (links[1]+ (J * SQUARE_BLOCK_SIZE)),links[2])
-		logging.warn('End csc_matrix')
-	
-	else:
-		mat = np.array(b[1].toArray())
-		if I == J:
-			mat = np.triu(mat)
-		i,j = np.nonzero(mat)
-		values = mat[i,j]
-		i = i + I * SQUARE_BLOCK_SIZE
-		j = j + J * SQUARE_BLOCK_SIZE		
-		for ind in range(len(values)):
-			edges.append((i[ind], j[ind], values[ind]))	
-		logging.warn('EdgesPerBlock ended')
-	print edges	
+	if I>J:
+		if isinstance(b[1], SparseMatrix):
+		
+			logging.warn('Start csc_matrix')
+			mat = sparse.csc_matrix((b[1].values, b[1].rowIndices, b[1].colPtrs), shape=(b[1].numRows, b[1].numCols))
+			links = sparse.find(mat)
+			edges = zip((links[0]+ (I * SQUARE_BLOCK_SIZE)), (links[1]+ (J * SQUARE_BLOCK_SIZE)),links[2])
+			logging.warn('End csc_matrix')
+		
+		else:
+			mat = np.array(b[1].toArray())
+			if I == J:
+				mat = np.triu(mat)
+			i,j = np.nonzero(mat)
+			values = mat[i,j]
+			i = i + I * SQUARE_BLOCK_SIZE
+			j = j + J * SQUARE_BLOCK_SIZE		
+			for ind in range(len(values)):
+				edges.append((i[ind], j[ind], values[ind]))	
+			logging.warn('EdgesPerBlock ended')	
 	return edges
 
 #SPARSE COMPATIBLE
@@ -287,8 +285,7 @@ def RowSumD(block_mat):
 	logging.warn('RowSumD started')
 	n = block_mat.numRows()
 	D_array = MatrixVectorMultiply(block_mat,np.ones(n))
-	logging.warn('D_array size = %d', len(D_array))
-	print "\n\n\n D: ", D_array[0:100] 
+	logging.warn('D_array size = %d', len(D_array)) 
 	D = DiagonalBlockMatrix(D_array,True)
 	D_array = D_array ** (-0.5)
 	D_array[D_array == np.inf] = 0 
@@ -319,10 +316,7 @@ def MapperLoadBlocksFromMatFile(filename):
 	logging.warn('MapperLoadBlocksFromMatFile started %s ', filename)
 	data = loadmat(filename)
 	logging.warn('Loaded data')
-	print filename
-	name = re.search('(\d_\d).mat$', filename, re.IGNORECASE).group(1)
-	print name
-	# name = max(enumerate(nameMatches))[1]
+	name = re.search('(\d+_\d+).mat$', filename, re.IGNORECASE).group(1)
 	G = data[name]
 	id = name.split('_')
 	n = G.shape[0]
@@ -353,7 +347,7 @@ def getdict(edge_list,dij):
 	edgeVSdistance = defaultdict(lambda : 0.0,edgeVSdistance)
 	return edgeVSdistance
 
-def GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,threshold):
+def GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,resultsFolder):
 	'''
 	dij : a vector with commute-time distance for each edge in edge_list
 	edge_list : a ndarry with shape (NumOfEdges,2)[Usually given as input along with adj mat]
@@ -369,25 +363,27 @@ def GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,thre
 	edgeVSdistance1 = getdict(edge_list1,dij1)
 	edgeVSdistance2 = getdict(edge_list2,dij2)
 
-	print "deltaA", deltaA
-
 	nonzero_edges, delA_values = ExtractEdgesFromAdjBlock(deltaA)
+	nonzero_delA = np.column_stack((nonzero_edges, np.absolute(delA_values)))
 
-	nonzero_delA = np.column_stack( (nonzero_edges, np.absolute(delA_values) ))
-
-	# this is np.ndarray with mapping -> edges,delE np.array([4,1,55]) where 4,1 are edge indices, 55 s deltaE
-	delE = [ [x[0],x[1], ( x[2] * abs( edgeVSdistance1([(x[0],x[1])]) - edgeVSdistance2([(x(0),x[1])]) ) ) ] for x in nonzero_delA ]
-
+	delE = []
+	for x in nonzero_delA:
+		a = int(x[0])
+		b = int(x[1])
+		c = x[2] * abs(edgeVSdistance1[(a,b)] - edgeVSdistance2[(a,b)])
+		delE.append([a, b, c])
+	delE = np.array(delE)
 	increasing_edge_index_deltaE = delE[delE[:,2].argsort()]
-	# decreasing_edge_index_deltaE = increasing_edge_index_deltaE[::-1]
-	deltaE_cumsum = np.cumsum(increasing_edge_index_deltaE[:,2])
-	anom_edge_begin = next(x[0] for x in enumerate(deltaE_cumsum) \
-		if x[1] > threshold)
-
-	Et = increasing_edge_index_deltaE\
-		[anom_edge_begin:len(increasing_edge_index_deltaE), 0:2]
-	Et = zip(Et[:, 0], Et[:, 1])
-	return Et
+	decreasing_edge_index_deltaE = increasing_edge_index_deltaE[::-1]
+	print decreasing_edge_index_deltaE
+	edges = increasing_edge_index_deltaE[:][:,0:2]
+	print "Edges shape ", edges.shape
+	anomalousNodes = Set([int(x) for x in edges.flatten()])
+	if not os.path.exists(resultsFolder):
+		os.makedirs(resultsFolder)
+	savemat(resultsFolder + "deltaE.mat", mdict={"deltaE": increasing_edge_index_deltaE})
+	print "Anomalous Nodes ", anomalousNodes
+	print "DONE"
 
 def LoadGraph(filename):
 	filelist = sc.textFile(filename + 'filelist.txt', minPartitions = 18)
@@ -412,6 +408,7 @@ if __name__=='__main__':
 	# -----------PARAMETERS------------------------------------------------------------------
 	nodeFolder1 = ""
 	nodeFolder2 = ""
+	resultsFolder = ""
 	PREFIX_CHAIN_PROD = 'PROD/chain-prod-'
 	USE_SAVED_CHAIN_PRODUCT = False
 
@@ -435,6 +432,7 @@ if __name__=='__main__':
 	    data = json.load(data_file)
 	    nodeFolder1 = data["nodeFolder1"]
 	    nodeFolder2 = data["nodeFolder2"]
+	    resultsFolder = data["resultsFolder"]
 	    SQUARE_BLOCK_SIZE = int(data["squareBlockSize"])
 	    SQUARE_TOTAL_SIZE = int(data["squareTotalSize"])
 		
@@ -458,5 +456,4 @@ if __name__=='__main__':
 	dij1 = CommuteTimeDistances(edge_list1, adjacency_mat1, tol, epsilon, d)	
 	dij2 = CommuteTimeDistances(edge_list2, adjacency_mat2, tol, epsilon, d)
 	
-	deltaE = GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,threshold)
-	print deltaE
+	GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,resultsFolder)
