@@ -378,8 +378,8 @@ def GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,resu
 	print decreasing_edge_index_deltaE
 	edges = increasing_edge_index_deltaE[:][:,0:2]
 	print "Edges shape ", edges.shape
-	anomalousNodes = Set([int(x) for x in edges.flatten()])
-	savemat(resultsFile, mdict={"deltaE": increasing_edge_index_deltaE})
+	anomalousNodes = np.unique([int(x) for x in edges.flatten()])
+	savemat(resultsFile, mdict={"deltaE": increasing_edge_index_deltaE, "nodes": anomalousNodes})
 	print "Anomalous Nodes ", anomalousNodes
 	print "DONE"
 
@@ -409,7 +409,7 @@ if __name__=='__main__':
 	resultsFolder = ""
 	PREFIX_CHAIN_PROD = 'PROD/chain-prod-'
 	USE_SAVED_CHAIN_PRODUCT = False
-	groundTruth = false
+	groundTruth = False
 
 	RUNTIME_PROFILING_ONLY = False
 	tol = 1e-2  # 1e-4
@@ -424,8 +424,8 @@ if __name__=='__main__':
 	if len(sys.argv) < 2:
 		optionsFile = "/Users/Pragya/Documents/SDL/SLD-C1/options.json"
 	else:
-		print "Got the options folder!"
 		optionsFile = sys.argv[1]
+		print "Got the options folder! ", optionsFile
 
 	with open(optionsFile) as data_file:    
 	    data = json.load(data_file)
@@ -438,7 +438,8 @@ if __name__=='__main__':
 
 	if not os.path.exists(resultsFolder):
 		os.makedirs(resultsFolder)
-	resultsFile = resultsFolder + "deltaEGT.mat" if groundTruth else "deltaE.mat"
+	filename = "GTresult.mat" if groundTruth else "result.mat"
+	resultsFile = resultsFolder + filename
 		
 	#---------------------------LOGGING----------------------------------------------
 	mode = 'WARNING'

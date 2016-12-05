@@ -2,7 +2,7 @@
 	"nodeFolder1": "/Users/Pragya/Documents/SDL/SLD-C1/SyntheticData2/",
 	"nodeFolder2": "/Users/Pragya/Documents/SDL/SLD-C1/SyntheticDataWithAnomalies2/",
 	"resultsFolder": "/Users/Pragya/Documents/SDL/SLD-C1/results/",
-	"groundTruth": true,
+	"groundTruth": false,
 	"squareBlockSize": 32,
 	"squareTotalSize": 64
 }

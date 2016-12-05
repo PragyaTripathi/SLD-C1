@@ -27,14 +27,14 @@ def sytheticDATA(size):
 	data1_y = np.concatenate((y1, y2, y3, y4), axis=0)
 	index = range(4*size)
 	data1 = np.column_stack((data1_x,data1_y))
-	plt.plot(data1_x, data1_y,'o')
+	# plt.plot(data1_x, data1_y,'o')
 	# add white noise
 	mean_whitenoise = [0, 0]
 	cov_whitenoise = [[0.8, 0.8], [0.8, 0.8]]
 	whitenoise_x, whitenoise_y = np.random.multivariate_normal(mean_whitenoise, cov_whitenoise, 4*size).T
 	data2_x = np.add(data1_x, whitenoise_x)
 	data2_y = np.add(data1_y, whitenoise_y)
-	plt.plot(data2_x, data2_y,'+')
+	# plt.plot(data2_x, data2_y,'+')
 
 	#sort data1 based on norm val
 	norm_data1 = [np.linalg.norm(data1[i]) for i in range(size*4)]
@@ -51,14 +51,14 @@ def sytheticDATA(size):
 	for i in range(anomoulous_index.size):
 		data2_x[anomoulous_index[i]] += noise_x[i]
 		data2_y[anomoulous_index[i]] += noise_y[i]
-	print data2_x, data2_y
-	plt.plot(data2_x, data2_y,'.')
-	plt.show()
+	# print data2_x, data2_y
+	# plt.plot(data2_x, data2_y,'.')
+	# plt.show()
 	return np.column_stack((data1_x,data1_y)), np.column_stack((data2_x,data2_y))
 
 x, y = sytheticDATA(16)
-print x
-print x.shape
+# print x
+# print x.shape
 sigma = 1/(2**0.5)
 graphFactory = GraphFactory(x, sigma, 0, '/Users/Pragya/Documents/SDL/SLD-C1/SyntheticData2/', True)
 graphFactory.createGraph()
