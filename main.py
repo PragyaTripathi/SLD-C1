@@ -14,4 +14,7 @@ p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=
 out, err = p.communicate()
 print out
 le = LearningEngine('/Users/Pragya/Documents/SDL/SLD-C1/le-config.json')
-le.runForOneRate(x, y, 1, 10, 10)
+# le.runForOneRate(x, y, 1, 100, 10)
+# le.runForOneRate(x, y, 1, 2, 10)
+# le.runForOneRate(x, y, 1, 10, 200)
+le.runWithRestarts(x, y, 1, 100, 10, 10)

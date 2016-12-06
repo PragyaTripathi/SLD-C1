@@ -56,11 +56,11 @@ def sytheticDATA(size):
 	# plt.show()
 	return np.column_stack((data1_x,data1_y)), np.column_stack((data2_x,data2_y))
 
-x, y = sytheticDATA(16)
-# print x
-# print x.shape
-sigma = 1/(2**0.5)
-graphFactory = GraphFactory(x, sigma, 0, '/Users/Pragya/Documents/SDL/SLD-C1/SyntheticData2/', True)
-graphFactory.createGraph()
-graphFactory2 = GraphFactory(y, sigma, 0, '/Users/Pragya/Documents/SDL/SLD-C1/SyntheticDataWithAnomalies2/', True)
-graphFactory2.createGraph()
+# x, y = sytheticDATA(16)
+# # print x
+# # print x.shape
+# sigma = 1/(2**0.5)
+# graphFactory = GraphFactory(x, sigma, 0, '/Users/Pragya/Documents/SDL/SLD-C1/SyntheticData2/', True)
+# graphFactory.createGraph()
+# graphFactory2 = GraphFactory(y, sigma, 0, '/Users/Pragya/Documents/SDL/SLD-C1/SyntheticDataWithAnomalies2/', True)
+# graphFactory2.createGraph()

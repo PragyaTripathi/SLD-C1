@@ -374,9 +374,12 @@ def GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,resu
 		delE.append([a, b, c])
 	delE = np.array(delE)
 	increasing_edge_index_deltaE = delE[delE[:,2].argsort()]
-	decreasing_edge_index_deltaE = increasing_edge_index_deltaE[::-1]
-	print decreasing_edge_index_deltaE
-	edges = increasing_edge_index_deltaE[:][:,0:2]
+	deltaE_cumsum = np.cumsum(increasing_edge_index_deltaE[:,2])
+	anom_edge_begin = np.argmax(deltaE_cumsum > threshold)
+	print anom_edge_begin
+	Et = increasing_edge_index_deltaE[anom_edge_begin:len(increasing_edge_index_deltaE), 0:3]
+	print Et
+	edges = Et[:,0:2]
 	print "Edges shape ", edges.shape
 	anomalousNodes = np.unique([int(x) for x in edges.flatten()])
 	savemat(resultsFile, mdict={"deltaE": increasing_edge_index_deltaE, "nodes": anomalousNodes})
@@ -419,7 +422,7 @@ if __name__=='__main__':
 
 	minP = 10000 ## Minimum number of partitions
 	#Set this threshold value.
-	threshold = 10
+	threshold = 0.2
 
 	if len(sys.argv) < 2:
 		optionsFile = "/Users/Pragya/Documents/SDL/SLD-C1/options.json"

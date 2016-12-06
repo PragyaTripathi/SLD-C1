@@ -21,22 +21,32 @@ class LearningEngine:
 			self.learningRate = data["learningRate"]
 		data = loadmat(self.resultsFolder + 'GTresult.mat')
 		self.deltaEGT = data["deltaE"]
+		self.groundtruth_edge = self.convertToInteger(self.deltaEGT[:,:2])
 		self.nodesGT = data["nodes"]
+
+	def writeGraphResultsToFile(self, results):
+		fh = open(self.resultsFolder + "results.txt","w")
+		fh.write(results)
+		fh.close()
 
 	def runForDifferentRates(self, x, y, spacing, iterations):
 		graphVarsForRates = {}
 		for rate in self.learningRate:
 			graphVars = self.runForOneRate(x, y, spacing, iterations, rate)
 			graphVarsForRates[rate] = graphVars
+		print graphVarsForRates
+		self.writeGraphResultsToFile(graphVarsForRates)
 	
 	def runWithRestarts(self, x, y, spacing, iterations, learningRate, noOfRestarts):
-			graphVarsForRestarts = {}
-			for i in range(noOfRestarts):
-				graphVars = self.runForOneRate(x, y, spacing, iterations, rate)
-				graphVarsForRates[i] = graphVars
+		graphVarsForRestarts = {}
+		for i in range(noOfRestarts):
+			graphVars = self.runForOneRate(x, y, spacing, iterations, learningRate)
+			graphVarsForRestarts[i] = graphVars
+		print graphVarsForRestarts
+		self.writeGraphResultsToFile(graphVarsForRestarts)
 
 	def runForOneRate(self, x, y, spacing, iterations, learningRate):
-		sigma = random.uniform(0, 100)
+		sigma = random.uniform(0, 10)
 		# [iteration, sigma, loss, learningRate]
 		graphVars = [[0, sigma, 0, learningRate]]
 		for i in range(iterations):
@@ -48,22 +58,22 @@ class LearningEngine:
 			data = loadmat(self.resultsFolder + 'result.mat')
 			deltaE = data["deltaE"]
 			nodes = data["nodes"]
-			# if len(nodes.symmetric_difference(self.nodesGT)) == 0:
-			# 	print "Found sigma ", sigma
-			# 	break
+			if nodes == self.nodesGT:
+				print "Found sigma ", sigma
+				break
 			loss, newSigma = self.gradientDescent(sigma, deltaE, learningRate)
 			print "Loss function", loss
 			print "New sigma", sigma
-			graphVars.append([i+1, sigma, loss, learningRate])
+			graphVars.append([i+1, newSigma, loss, learningRate])
 			if sigma == newSigma:
 				print "Sigma didn't change in the last iteration"
 				break
 			else:
 				sigma = newSigma
 		print "Graph elements ", graphVars
-		plt.plot(graphVars[:][0],graphVars[:][1], 'o')
-		plt.plot(graphVars[:][0],graphVars[:][2], '+')
-		plt.show()
+		# plt.plot(graphVars[:][0],graphVars[:][1], 'o')
+		# plt.plot(graphVars[:][0],graphVars[:][2], '+')
+		# plt.show()
 		return graphVars
 	
 	#Assuming ranks is an array of nodes. Their position is defined by array index.
@@ -87,27 +97,25 @@ class LearningEngine:
 		out, err = p.communicate()
 		print out
 
-	def convertToInteger(self, deltaE):
-		deltaE[:, 0] = np.asarray(deltaE[:, 0]).astype(int)
-		deltaE[:, 1] = np.asarray(deltaE[:, 1]).astype(int)
-		return deltaE
+	def convertToInteger(self, deltaEArray):
+		deltaEArray[:, 0] = np.asarray(deltaEArray[:, 0]).astype(int)
+		deltaEArray[:, 1] = np.asarray(deltaEArray[:, 1]).astype(int)
+		return deltaEArray
 
 	def lossFunction(self, deltaE):
 		# print("======================== edge list of deltaE =========================")
 		delta_edge = self.convertToInteger(deltaE[:,:2])
 		print(delta_edge)
 		# print("======================== edge list of groundTruth deltaE =============")
-		groundtruth_edge = self.convertToInteger(self.deltaEGT[:,:2])
-		print(groundtruth_edge)
 		sum = 0
 		# print("=======================================================================")
 		# Iterate edge in groundtruthdEdge. If there is same edge in delteEdge, sum+= (score1 - score2)**2; otherwise, sum+=score1**2
-		for i in range(len(groundtruth_edge)):
+		for i in range(len(self.groundtruth_edge)):
 			sum += (self.deltaEGT[i][2])**2
 			for j in range(len(delta_edge)):
 				# print "deltaEdge",i,": ",delta_edge[j]
 				# print "deltaGroundTruth", j, ": ",groundtruth_edge[i]
-				if (delta_edge[j] == groundtruth_edge[i]).all() or (delta_edge[j] == groundtruth_edge[i][::-1]).all() :
+				if (delta_edge[j] == self.groundtruth_edge[i]).all() or (delta_edge[j] == self.groundtruth_edge[i][::-1]).all() :
 					# print "true"
 					sum += (self.deltaEGT[i][2] - deltaE[j][2])**2
 					sum -= (self.deltaEGT[i][2])**2
@@ -116,12 +124,9 @@ class LearningEngine:
 		# Iterate edge in delteEdge. If there no same edge in groundtruthdEdge, sum+=score2**2; 
 		for i in range(len(delta_edge)):
 			sum += (deltaE[i][2])**2
-			for j in range(len(groundtruth_edge)):
-				 if (delta_edge[i] == groundtruth_edge[j]).all() or (delta_edge[i] == groundtruth_edge[j][::-1]).all():
+			for j in range(len(self.groundtruth_edge)):
+				 if (delta_edge[i] == self.groundtruth_edge[j]).all() or (delta_edge[i] == self.groundtruth_edge[j][::-1]).all():
 					sum -= (deltaE[i][2])**2
 					# print "sum is", sum
 					break
 		return sum
-
-# le = LearningEngine('/Users/Pragya/Documents/SDL/SLD-C1/le-config.json')
-# le.runForOneRate(x, y, 0, 10, 10)
