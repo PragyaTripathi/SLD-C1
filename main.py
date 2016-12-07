@@ -1,6 +1,8 @@
 from DataSynthesizer import *
 from GraphFactory import *
 from LearningEngine import *
+import logging
+from datetime import datetime
 
 x, y = sytheticDATA(16)
 sigma = 1/(2**0.5)
@@ -13,8 +15,10 @@ cmd = ["/usr/local/src/spark-2.0.0-bin-hadoop2.7/bin/spark-submit", "/Users/Prag
 p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 out, err = p.communicate()
 print out
-le = LearningEngine('/Users/Pragya/Documents/SDL/SLD-C1/le-config.json')
-# le.runForOneRate(x, y, 1, 100, 10)
+logfname = 'LE_'+datetime.now().strftime('%Y-%m-%d-%H:%M:%S')+'.log'
+logging.basicConfig(filename=logfname,filemode='w',level= logging.INFO,format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')	
+le = LearningEngine('/Users/Pragya/Documents/SDL/SLD-C1/le-config.json', logging)
+le.runForOneRate(x, y, 1, 100, 1)
 # le.runForOneRate(x, y, 1, 2, 10)
 # le.runForOneRate(x, y, 1, 10, 200)
-le.runWithRestarts(x, y, 1, 100, 10, 10)
+# le.runWithRestarts(x, y, 1, 100, 10, 10)

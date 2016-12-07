@@ -355,6 +355,7 @@ def GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,resu
 
 	delta e(i,j) = |A2(i,j) - A1(i,j)| * | d2 -d1(i,j)|
 	'''
+	logging.warn('Starting GetdeltaE')	
 	#difference of adjs, not taken absolute yet.
 	deltaA =  adjacency_mat1.subtract(adjacency_mat2)
 	#difference in commutedistnaces.
@@ -385,6 +386,7 @@ def GetdeltaE(adjacency_mat1,edge_list1,dij1,adjacency_mat2,edge_list2,dij2,resu
 	savemat(resultsFile, mdict={"deltaE": increasing_edge_index_deltaE, "nodes": anomalousNodes})
 	print "Anomalous Nodes ", anomalousNodes
 	print "DONE"
+	logging.warn('DONE')	
 
 def LoadGraph(filename):
 	filelist = sc.textFile(filename + 'filelist.txt', minPartitions = 18)

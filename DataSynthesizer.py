@@ -4,7 +4,7 @@ from GraphFactory import *
 import matplotlib.pyplot as plt
 
 def sytheticDATA(size): 
-	mean1 = [10, 15]
+	mean1 = [5, 5]
 	cov1 = [[3, 0], [0, 1.5]]
 	x1, y1 = np.random.multivariate_normal(mean1, cov1, size).T
 
@@ -12,7 +12,7 @@ def sytheticDATA(size):
 	cov2 = [[1, 0], [0, 2]]
 	x2, y2 = np.random.multivariate_normal(mean2, cov2, size).T
 
-	mean3 = [15, 10]
+	mean3 = [9, 10]
 	cov3 = [[3, 0], [0, 2]]
 	x3, y3 = np.random.multivariate_normal(mean3, cov3, size).T
 
@@ -45,7 +45,7 @@ def sytheticDATA(size):
 	# generate anomolous nodes
 	anomoulous_index = sort_array[:size*4/10][:, 1]
 	print(anomoulous_index)
-	mean_noise = [10, 10]
+	mean_noise = [5, 5]
 	cov_noise = [[0.8, 0.8], [0.8, 0.8]]
 	noise_x, noise_y = np.random.multivariate_normal(mean_noise, cov_noise, anomoulous_index.size).T
 	for i in range(anomoulous_index.size):
@@ -57,10 +57,15 @@ def sytheticDATA(size):
 	return np.column_stack((data1_x,data1_y)), np.column_stack((data2_x,data2_y))
 
 # x, y = sytheticDATA(16)
-# # print x
-# # print x.shape
-# sigma = 1/(2**0.5)
-# graphFactory = GraphFactory(x, sigma, 0, '/Users/Pragya/Documents/SDL/SLD-C1/SyntheticData2/', True)
+# # # print x
+# # # print x.shape
+# # sigma = 1/(2**0.5)
+# graphFactory = GraphFactory(x, sigma, 0, '/Users/Pragya/Documents/SDL/SLD-C1/SyntheticDataTest/', True)
 # graphFactory.createGraph()
-# graphFactory2 = GraphFactory(y, sigma, 0, '/Users/Pragya/Documents/SDL/SLD-C1/SyntheticDataWithAnomalies2/', True)
+# graphFactory2 = GraphFactory(y, sigma, 0, '/Users/Pragya/Documents/SDL/SLD-C1/SyntheticDataWithAnomaliesTest/', True)
 # graphFactory2.createGraph()
+# print "Starting CAD"
+# cmd = ["/usr/local/src/spark-2.0.0-bin-hadoop2.7/bin/spark-submit", "/Users/Pragya/Documents/SDL/SLD-C1/CAD.py", "/Users/Pragya/Documents/SDL/SLD-C1/optionsTest.json"]
+# p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+# out, err = p.communicate()
+# print out
