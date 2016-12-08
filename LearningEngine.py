@@ -35,25 +35,30 @@ class LearningEngine:
 		fh.write(results)
 		fh.close()
 
-	def runForDifferentRates(self, x, y, spacing, iterations):
+	def runForDifferentRates(self, x, y, spacing, iterations, initialSigma):
 		graphVarsForRates = {}
 		for rate in self.learningRate:
-			graphVars = self.runForOneRate(x, y, spacing, iterations, rate)
+			graphVars = self.runForOneRate(x, y, spacing, iterations, rate, initialSigma)
 			graphVarsForRates[rate] = graphVars
 		print graphVarsForRates
 		self.writeGraphResultsToFile(graphVarsForRates)
 	
 	def runWithRestarts(self, x, y, spacing, iterations, learningRate, noOfRestarts):
 		graphVarsForRestarts = {}
+		sigma = [0.01, 0.1, 1, 10, 100, 1000]
+		sigma.append(random.uniform(0, 10))
+		sigma.append(random.uniform(0, 10))
+		sigma.append(random.uniform(0, 10))
+		sigma.append(random.uniform(0, 10))
 		for i in range(noOfRestarts):
-			graphVars = self.runForOneRate(x, y, spacing, iterations, learningRate)
+			graphVars = self.runForOneRate(x, y, spacing, iterations, learningRate, sigma[i])
 			graphVarsForRestarts[i] = graphVars
 		print graphVarsForRestarts
 		self.writeGraphResultsToFile(graphVarsForRestarts)
 
-	def runForOneRate(self, x, y, spacing, iterations, learningRate):
+	def runForOneRate(self, x, y, spacing, iterations, learningRate, initialSigma):
 		# sigma = random.uniform(0, 10)
-		sigma = 1
+		sigma = initialSigma
 		prevSigma = 0
 		prevLoss = sys.maxint
 		self.logger.warn("Running ML engine for one rate.")
