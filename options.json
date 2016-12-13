@@ -1,7 +1,7 @@
 {
-	"nodeFolder1": "/Users/Pragya/Documents/SDL/SLD-C1/GeneticAlgorithm/",
-	"nodeFolder2": "/Users/Pragya/Documents/SDL/SLD-C1/GeneticAlgorithm2/",
-	"resultsFolder": "/Users/Pragya/Documents/SDL/SLD-C1/results/",
+	"nodeFolder1": "/home/ldapuser1/code-from-git/SLD-C1/GeneticAlgorithm/",
+	"nodeFolder2": "/home/ldapuser1/code-from-git/SLD-C1/GeneticAlgorithm2/",
+	"resultsFolder": "/home/ldapuser1/code-from-git/SLD-C1/results/",
 	"groundTruth": true,
 	"squareBlockSize": 32,
 	"squareTotalSize": 64

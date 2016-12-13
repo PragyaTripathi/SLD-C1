@@ -1,7 +1,7 @@
 {
-	"nodeFolder1": "/Users/Pragya/Documents/SDL/SLD-C1/January1994/",
-	"nodeFolder2": "/Users/Pragya/Documents/SDL/SLD-C1/January1995/",
-	"resultsFolder": "/Users/Pragya/Documents/SDL/SLD-C1/resultsForReal/",
+	"nodeFolder1": "/home/ldapuser1/code-from-git/SLD-C1/RealData/",
+	"nodeFolder2": "/home/ldapuser1/code-from-git/SLD-C1/RealData2/",
+	"resultsFolder": "/home/ldapuser1/code-from-git/SLD-C1/resultsForReal/",
 	"groundTruth": false,
 	"squareBlockSize": 900,
 	"squareTotalSize": 16200

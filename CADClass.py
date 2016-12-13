@@ -331,4 +331,4 @@ class CAD:
 
 if __name__=='__main__':
 	cad = CAD(128, 256)
-	cad.run('/Users/Pragya/Documents/SDL/SLD-C1/Test2/', '/Users/Pragya/Documents/SDL/SLD-C1/TestWithAnomalies2/')
+	cad.run('/home/ldapuser1/code-from-git/SLD-C1/Test2/', '/home/ldapuser1/code-from-git/SLD-C1/TestWithAnomalies2/')

@@ -1,7 +1,7 @@
 import os, subprocess
 
 ps = {}
-cmd = ["/usr/local/src/spark-2.0.0-bin-hadoop2.7/bin/spark-submit", "/Users/Pragya/Documents/SDL/SLD-C1/CAD.py", "/Users/Pragya/Documents/SDL/SLD-C1/options.json"]
+cmd = ["/home/ldapuser1/spark-2.0.2-bin-hadoop2.4/bin/spark-submit", "/home/ldapuser1/code-from-git/SLD-C1/CAD.py", "/home/ldapuser1/code-from-git/SLD-C1/options.json"]
 p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 # ps[p.pid] = p
 out, err = p.communicate()

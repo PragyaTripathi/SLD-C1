@@ -515,8 +515,8 @@ if __name__=='__main__':
 	sqlContext = SQLContext(sc)
 	
 	# -----------PARAMETERS------------------------------------------------------------------
-	INPUT_DIR = '/Users/Pragya/Documents/SDL/SLD-C1/Test2/'
-	BLOCKS_DIR = '/Users/Pragya/Documents/SDL/SLD-C1/Test2/SparkBlocks/'
+	INPUT_DIR = '/home/ldapuser1/code-from-git/SLD-C1/Test2/'
+	BLOCKS_DIR = '/home/ldapuser1/code-from-git/SLD-C1/Test2/SparkBlocks/'
 
 	#----------------------------------------------------------------
 	

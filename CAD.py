@@ -427,7 +427,7 @@ if __name__=='__main__':
 	threshold = 0.1
 
 	if len(sys.argv) < 2:
-		optionsFile = "/Users/Pragya/Documents/SDL/SLD-C1/options.json"
+		optionsFile = "/home/ldapuser1/code-from-git/SLD-C1/options.json"
 	else:
 		optionsFile = sys.argv[1]
 		print "Got the options folder! ", optionsFile

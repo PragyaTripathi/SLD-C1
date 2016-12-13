@@ -71,17 +71,17 @@ def evalFunction(newSigma):
 
 x, y = sytheticDATA(16)
 sig = 1/(2**0.5)
-graphFactory = GraphFactory(x, sig, 0, '/Users/Pragya/Documents/SDL/SLD-C1/GeneticAlgorithm/', True)
+graphFactory = GraphFactory(x, sig, 0, '/home/ldapuser1/code-from-git/SLD-C1/GeneticAlgorithm/', True)
 graphFactory.createGraph()
-graphFactory2 = GraphFactory(y, sig, 0, '/Users/Pragya/Documents/SDL/SLD-C1/GeneticAlgorithm2/', True)
+graphFactory2 = GraphFactory(y, sig, 0, '/home/ldapuser1/code-from-git/SLD-C1/GeneticAlgorithm2/', True)
 graphFactory2.createGraph()
 print "Starting CAD"
-cmd = ["/usr/local/src/spark-2.0.0-bin-hadoop2.7/bin/spark-submit", "/Users/Pragya/Documents/SDL/SLD-C1/CAD.py", "/Users/Pragya/Documents/SDL/SLD-C1/options.json"]
+cmd = ["/home/ldapuser1/spark-2.0.2-bin-hadoop2.4/bin/spark-submit", "/home/ldapuser1/code-from-git/SLD-C1/CAD.py", "/home/ldapuser1/code-from-git/SLD-C1/options.json"]
 proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 output, error = proc.communicate()
 print output
 
-configFile = '/Users/Pragya/Documents/SDL/SLD-C1/le-config.json'
+configFile = '/home/ldapuser1/code-from-git/SLD-C1/le-config.json'
 with open(configFile) as config_file:
 	data = json.load(config_file)
 	spark = data["spark"]
