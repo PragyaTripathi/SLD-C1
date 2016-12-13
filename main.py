@@ -19,7 +19,7 @@ print out
 logfname = 'LE_'+datetime.now().strftime('%Y-%m-%d-%H:%M:%S')+'.log'
 logging.basicConfig(filename=logfname,filemode='w',level= logging.INFO,format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')	
 le = LearningEngine('/Users/Pragya/Documents/SDL/SLD-C1/le-config.json', logging)
-# le.runForOneRate(x, y, 1, 100, 0.5, random.uniform(0, 10))
+le.runForOneRate(x, y, 1, 20, 0.5, 100)
 # le.runForOneRate(x, y, 1, 2, 10, random.uniform(0, 10))
 # le.runForOneRate(x, y, 1, 10, 200, random.uniform(0, 10))
-le.runWithRestarts(x, y, 1, 100, 0.2, 20)
+# le.runWithRestarts(x, y, 1, 100, 0.2, 20)

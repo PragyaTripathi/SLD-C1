@@ -1,6 +1,6 @@
 {
-	"nodeFolder1": "/Users/Pragya/Documents/SDL/SLD-C1/SyntheticData2/",
-	"nodeFolder2": "/Users/Pragya/Documents/SDL/SLD-C1/SyntheticDataWithAnomalies2/",
+	"nodeFolder1": "/Users/Pragya/Documents/SDL/SLD-C1/GeneticAlgorithm/",
+	"nodeFolder2": "/Users/Pragya/Documents/SDL/SLD-C1/GeneticAlgorithm2/",
 	"resultsFolder": "/Users/Pragya/Documents/SDL/SLD-C1/results/",
 	"groundTruth": true,
 	"squareBlockSize": 32,

@@ -424,7 +424,7 @@ if __name__=='__main__':
 
 	minP = 10000 ## Minimum number of partitions
 	#Set this threshold value.
-	threshold = 0.2
+	threshold = 0.1
 
 	if len(sys.argv) < 2:
 		optionsFile = "/Users/Pragya/Documents/SDL/SLD-C1/options.json"
@@ -445,7 +445,9 @@ if __name__=='__main__':
 		os.makedirs(resultsFolder)
 	filename = "GTresult.mat" if groundTruth else "result.mat"
 	resultsFile = resultsFolder + filename
-		
+
+	if not groundTruth and os.path.exists(resultsFile):
+		os.remove(resultsFile)
 	#---------------------------LOGGING----------------------------------------------
 	mode = 'WARNING'
 	loglevel = 'logging.'+mode

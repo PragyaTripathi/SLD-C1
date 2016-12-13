@@ -38,7 +38,7 @@ class GraphFactory:
 	def formGraphFromFlattenedArray(self, flatArray):
 		arrayLen = np.asarray(flatArray).shape[0]
 		print arrayLen
-		p = self.find_divisor(arrayLen)
+		p = 900
 		print p
 		edgeList = []
 		for i in range(arrayLen/p):
@@ -50,7 +50,7 @@ class GraphFactory:
 				for m in range(p):
 					subArray = []
 					for n in range(p):
-						value = exp(-1 * self.sumOfEuclidean(flatArray, i*p+m, j*p+n)/(2*self.sigma**2)) if i*p+m != j*p+n else 0
+						value = self.radialBasisKernelFunction(flatArray, i*p+m, j*p+n)
 						if value != 0:
 							edgeList.append([i*p+m, j*p+n])
 						subArray.append(value)
@@ -63,9 +63,15 @@ class GraphFactory:
 
 	def sumOfEuclidean(self, flatArray, index1, index2):
 		sum = 0
-		for i in range(np.asarray(flatArray[0]).size):
-			sum += (flatArray[index1][i] - flatArray[index2][i])**2
+		if np.asarray(flatArray[0]).size > 1:
+			for i in range(np.asarray(flatArray[0]).size):
+				sum += (flatArray[index1][i] - flatArray[index2][i])**2
+		else:
+			sum = (flatArray[index1] - flatArray[index2])**2
 		return sum
+
+	def radialBasisKernelFunction(self, flatArray, index1, index2):
+		return exp(-1 * self.sumOfEuclidean(flatArray, index1, index2)/(2*self.sigma**2)) if index1 != index2 else 0
 
 	def my_range(self, start, end, step):
 		while end <= start:
@@ -73,8 +79,8 @@ class GraphFactory:
 			start += step
 
 	def find_divisor(self, length):
-		for i in self.my_range(length-1, 10, -1):
-			if length % i == 0 and i % 4 == 0:
+		for i in self.my_range(length/2, 10, -1):
+			if length % i == 0 and i % 4 == 0 and int(length**0.5)**2 == length:
 				return i
 		return length
 
